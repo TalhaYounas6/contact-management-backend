@@ -7,19 +7,19 @@ const validateTokenHandler = asyncHandler(async (req, res, next) => {
   if (header && header.startsWith("Bearer")) {
     token = header.split(" ")[1];
   }
+
+  if (!token) {
+    res.status(401);
+    throw new Error("Token is missing");
+  }
+
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      res.status(401);
-      throw new Error("Token is invalid");
+      return res.status(401).json({ error: "Token is invalid" });
     } else {
       //   console.log(decoded);
       req.user = decoded.user;
       next();
-    }
-
-    if (!token) {
-      res.status(401);
-      throw new Error("Token is missing");
     }
   });
 });
